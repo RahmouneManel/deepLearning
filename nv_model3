@@ -319,7 +319,7 @@ def InceptionResNetV2(include_top=True,
 
 
 if __name__ == '__main__':
-    model = InceptionResNetV2(include_top=True, weights='imagenet')
+    model = InceptionResNetV2(include_top=True, weights=None)
 
     img_path = 'elephant.jpg'
     img = image.load_img(img_path, target_size=(299, 299))
