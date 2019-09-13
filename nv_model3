@@ -70,16 +70,6 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
         branch_2 = conv2d_bn(branch_2, 64, 3)
         branches = [branch_0, branch_1, branch_2]
 
-        for i in len(branches):
-          pass
-          Rbranch_0 = conv2d_bn(branches[i], 384, 3, strides=2, padding='valid')
-          Rbranch_1 = conv2d_bn(branches[i], 256, 1)
-          Rbranch_1 = conv2d_bn(Rbranch_1, 256, 3)
-          Rbranch_1 = conv2d_bn(Rbranch_1, 384, 3, strides=2, padding='valid')
-          Rbranch_pool = MaxPooling2D(3, strides=2, padding='valid')(branches[i])
-          Rbranches = [Rbranch_0, Rbranch_1, Rbranch_pool]
-          x = Concatenate(axis=channel_axis, name='mixed_6a')(Rbranches)
-
 
     elif block_type == 'block17':
         branch_0 = conv2d_bn(x, 192, 1)
@@ -87,32 +77,26 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
         branch_1 = conv2d_bn(branch_1, 160, [1, 7])
         branch_1 = conv2d_bn(branch_1, 192, [7, 1])
         branches = [branch_0, branch_1]
-
-        for i in len(branches):
+    #plus
+    elif block_type == 'block':
+       branch_0 =conv2d_bn(x, 64 , 3)
+       branch_0 =conv2d_bn(branch_0,256, 11)
+       branch_0=conv2d_bn(branch_0, 128, 5)
+       
+       branch_1 =conv2d_bn(branch_0, 64, 5)
+       branch_1 =conv2d_bn(branch_0, 128, 5)
+       branch_1 =conv2d_bn(branch_0, 256, 3)
+       
+       branch_2 =conv2d_bn(branch_1, 32, 3)
+       
+       branch_3 =conv2d_bn(branch_2, 32, 3)
+       branch_3 =conv2d_bn(branch_3, 32, 3)
+       
+       branches = [branch_0, branch_1,branch_2,branch_3]
+    
+       for i in len(branches):
           pass
-          Rbranch_0 = conv2d_bn(branches[i], 256, 1)
-          Rbranch_0 = conv2d_bn(Rbranch_0, 384, 3, strides=2, padding='valid')
-          Rbranch_1 = conv2d_bn(branches[i], 256, 1)
-          Rbranch_1 = conv2d_bn(Rbranch_1, 288, 3, strides=2, padding='valid')
-          Rbranch_2 = conv2d_bn(branches[i], 256, 1)
-          Rbranch_2 = conv2d_bn(Rbranch_2, 288, 3)
-          Rbranch_2 = conv2d_bn(Rbranch_2, 320, 3, strides=2, padding='valid')
-          Rbranch_pool = MaxPooling2D(3, strides=2, padding='valid')(branches[i])
-          Rbranches = [Rbranch_0, Rbranch_1, Rbranch_2, Rbranch_pool]
-          x = Concatenate(axis=channel_axis, name='mixed_7a')(Rbranches)
-
-
-
-    elif block_type == 'block8':
-        branch_0 = conv2d_bn(x, 192, 1)
-        branch_1 = conv2d_bn(x, 192, 1)
-        branch_1 = conv2d_bn(branch_1, 224, [1, 3])
-        branch_1 = conv2d_bn(branch_1, 256, [3, 1])
-        branches = [branch_0, branch_1]
-
-        for i in len(branches):
-          pass
-          Rbranch_0 = conv2d_bn(branches[i], 96, 1)
+         Rbranch_0 = conv2d_bn(branches[i], 96, 1)
           Rbranch_1 = conv2d_bn(branches[i], 48, 1)
           Rbranch_1 = conv2d_bn(Rbranch_1, 64, 5)
           Rbranch_2 = conv2d_bn(branches[i], 64, 1)
@@ -125,6 +109,15 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
           x = Concatenate(axis=channel_axis, name='mixed_5b')(Rbranches)
 
 
+
+    elif block_type == 'block8':
+        branch_0 = conv2d_bn(x, 192, 1)
+        branch_1 = conv2d_bn(x, 192, 1)
+        branch_1 = conv2d_bn(branch_1, 224, [1, 3])
+        branch_1 = conv2d_bn(branch_1, 256, [3, 1])
+        branches = [branch_0, branch_1]
+
+        
     else:
         raise ValueError('Unknown Inception-ResNet block type. '
                          'Expects "block35", "block17" or "block8", '
@@ -192,6 +185,10 @@ def InceptionResNetV2(include_top=True,
     x = conv2d_bn(x, 80, 1, padding='valid')
     x = conv2d_bn(x, 192, 3, padding='valid')
     x = MaxPooling2D(3, strides=2)(x)
+    #plus
+    x = conv2d_bn(x, 96, 3, strides=2, padding='valid')
+    x = conv2d_bn(x, 96, 3, padding='valid')
+    x = conv2d_bn(x, 128, 5)
 
     # Mixed 5b (Inception-A block): 35 x 35 x 320
     branch_0 = conv2d_bn(x, 96, 1)
@@ -210,7 +207,7 @@ def InceptionResNetV2(include_top=True,
     for block_idx in range(1, 11):
         x = inception_resnet_block(x,
                                    scale=0.17,
-                                   block_type='0',
+                                   block_type='block35',
                                    block_idx=block_idx)
 
     # Mixed 6a (Reduction-A block): 17 x 17 x 1088
@@ -221,9 +218,17 @@ def InceptionResNetV2(include_top=True,
     branch_pool = MaxPooling2D(3, strides=2, padding='valid')(x)
     branches = [branch_0, branch_1, branch_pool]
     x = Concatenate(axis=channel_axis, name='mixed_6a')(branches)
+    
+    # 10x block (Inception block): plus
+    for block_idx in range(1, 11):
+        x = inception_resnet_block(x,
+                                   scale=0.07,
+                                   block_type='block',
+                                   block_idx=block_idx)
 
-    # 20x block17 (Inception-ResNet-B block): 17 x 17 x 1088
-    for block_idx in range(1, 21):
+    
+    # 5x block17 (Inception-ResNet-B block): 17 x 17 x 1088
+    for block_idx in range(1, 6):
         x = inception_resnet_block(x,
                                    scale=0.1,
                                    block_type='block17',
@@ -240,7 +245,15 @@ def InceptionResNetV2(include_top=True,
     branch_pool = MaxPooling2D(3, strides=2, padding='valid')(x)
     branches = [branch_0, branch_1, branch_2, branch_pool]
     x = Concatenate(axis=channel_axis, name='mixed_7a')(branches)
+    
+    # 10x block (Inception block): plus
+    for block_idx in range(1, 14):
+        x = inception_resnet_block(x,
+                                   scale=0.009,
+                                   block_type='block',
+                                   block_idx=block_idx)
 
+    
     # 10x block8 (Inception-ResNet-C block): 8 x 8 x 2080
     for block_idx in range(1, 10):
         x = inception_resnet_block(x,
@@ -266,7 +279,7 @@ def InceptionResNetV2(include_top=True,
         elif pooling == 'max':
             x = GlobalMaxPooling2D()(x)
 
-    # Ensure that the model takes into account
+    # Ensure that the model takes into account NvModel
     # any potential predecessors of `input_tensor`
     if input_tensor is not None:
         inputs = get_source_inputs(input_tensor)
