@@ -102,7 +102,12 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
        branch_3 =conv2d_bn(branch_2, 32, 3)
        branch_3 =conv2d_bn(branch_3, 32, 3)
        
-       branches = [branch_0, branch_1,branch_2]
+       branch_4 =conv2d_bn(branch_2, 64, 3)
+       branch_4 =conv2d_bn(branch_4, 128, 3)
+       branch_4 =conv2d_bn(branch_4, 256, 3)
+       branch_4 =conv2d_bn(branch_4, 256, 3)
+       
+       branches = [branch_0, branch_1,branch_2,branch_3,branch_4]
     
 
 
