@@ -321,8 +321,9 @@ def InceptionResNetV2(include_top=True,
                                     BASE_WEIGHT_URL + weights_filename,
                                     cache_subdir='models',
                                     md5_hash='d19885ff4a710c122648d3b5c3b684e4')
+        model.save_weights('C:/Users/Rahmoune/Desktop/my_model_weights.h5')                            
         model.load_weights(weights_path)
-        model.save_weights('C:/Users/Rahmoune/Desktop/my_model_weights.h5')
+        
         print(model.get_weights())
     return model
 
@@ -341,3 +342,4 @@ if __name__ == '__main__':
 
     preds = model.predict(x)
     print('Predicted:', decode_predictions(preds))
+    model.save_weights('C:/Users/Rahmoune/Desktop/my_model_weights.h5')
