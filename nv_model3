@@ -11,6 +11,7 @@ from keras.layers import AveragePooling2D
 from keras.layers import BatchNormalization
 from keras.layers import Concatenate
 from keras.layers import Conv2D
+from keras.layers import Dropout
 from keras.layers import Dense
 from keras.layers import GlobalAveragePooling2D
 from keras.layers import GlobalMaxPooling2D
@@ -63,6 +64,7 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
     
     if block_type == 'block35':
         branch_0 = conv2d_bn(x, 32, 1)
+        drop_out = Dropout(branch_0, 0.2)
         branch_1 = conv2d_bn(x, 32, 1)
         branch_1 = conv2d_bn(branch_1, 32, 3)
         branch_2 = conv2d_bn(x, 32, 1)
@@ -76,22 +78,22 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
         branch_1 = conv2d_bn(x, 128, 1)
         branch_1 = conv2d_bn(branch_1, 160, [1, 7])
         branch_1 = conv2d_bn(branch_1, 192, [7, 1])
+        drop_out = Dropout(branch_0, 0.2)
         branches = [branch_0, branch_1]
     #plus
     elif block_type == 'block':
        branch_0 =conv2d_bn(x, 64 , 3)
        branch_0 =conv2d_bn(branch_0,256, 11)
        branch_0=conv2d_bn(branch_0, 128, 5)
-       
-       branch_1 =conv2d_bn(branch_0, 64, 5)
+       drop_out = Dropout(branch_0, 0.2)
        branch_1 =conv2d_bn(branch_0, 128, 5)
        branch_1 =conv2d_bn(branch_0, 256, 3)
-       
+       drop_out = Dropout(branch_0, 0.2)
        branch_2 =conv2d_bn(branch_1, 32, 3)
        
        branch_3 =conv2d_bn(branch_2, 32, 3)
        branch_3 =conv2d_bn(branch_3, 32, 3)
-       
+       drop_out = Dropout(branch_0, 0.2)
        branches = [branch_0, branch_1,branch_2,branch_3]
     
        for i in len(branches):
